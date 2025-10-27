@@ -1,0 +1,22 @@
+meta {
+  name: get product data - sauce hollandaise
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://opengtindb.org/?ean=8712566126057&cmd=query&queryid=400000000
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ean: 8712566126057
+  cmd: query
+  queryid: 400000000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
