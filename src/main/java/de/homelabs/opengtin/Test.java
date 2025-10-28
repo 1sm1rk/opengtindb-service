@@ -54,8 +54,6 @@ public class Test {
 			+ "validated=0 %\n"
 			+ "---\n"
 			+ "\n"
-			+ "error=0\n"
-			+ "---\n"
 			+ "asin=\n"
 			+ "name=\n"
 			+ "detailname=Lukull Sauce Hollandaise Balance 250 ml\n"
@@ -76,25 +74,7 @@ public class Test {
 	String response3 = "\n"
 			+ "error=2\n"
 			+ "---\n"
-			+ "\n"
-			+ "error=0\n"
-			+ "---\n"
-			+ "asin=\n"
-			+ "name=\n"
-			+ "detailname=Lukull Sauce Hollandaise Balance 250 ml\n"
-			+ "vendor=Lukull\n"
-			+ "maincat=\n"
-			+ "subcat=\n"
-			+ "maincatnum=-1\n"
-			+ "subcatnum=\n"
-			+ "contents=\n"
-			+ "origin=Niederlande\n"
-			+ "descr=Trinkwasser, entrahmte MILCH, pflanzliche Öle (Palm, Raps), EIGELB, modifizierte Stärke, Zucker, Speisesalz, Zitronensaftkonzentrat, Verdickungsmittel (Xanthan, Guarkernmehl, Johannisbrotkernmehl), Säuerungsmittel (Milchsäure), Aromen (mit MILCH, SELLERIE) Dextrose.Kann GLUTEN enthalten. Nährwertangaben je 100 ml Brennwert 710 kJ 170 kcal Fett 15,0 g davon gesättigte Fettsäuren 5,0 g Kohlenhydrate 6,0 g davon Zucker 3,0 g Eiweiß 2,0 g Salz 1,0 g Ballaststoffe 0,3 g Sonderpreis: geringes Mindesthaltbarkeitsdatum\n"
-			+ "name_en=\n"
-			+ "detailname_en=\n"
-			+ "descr_en=\n"
-			+ "validated=0 %\n"
-			+ "---\n";
+			+ "\n";
 	
 	public void convert() {
 		/*
@@ -109,27 +89,49 @@ public class Test {
 		Properties test = new Properties();
 		
 		try {
-			long error_marker_counter = Pattern.compile(error_pattern).matcher(response3).results().count();
+			//long error_marker_counter = Pattern.compile(error_pattern).matcher(response3).results().count();
 			//long error_marker_counter = response3.
-			System.out.println("Error:"+error_marker_counter);
-			String[] parts = response3.split("---");
+			//System.out.println("Error:"+error_marker_counter);
+			String[] parts = response.split("---");
+			
+			//parse error code
+			test.load(new ByteArrayInputStream(parts[0].getBytes()));
+			if (!test.containsKey("error")) {
+				System.out.println("Error code not found!");
+				System.exit(1);
+			} else {
+				System.out.println("Status Code: " + test.getProperty("error"));
+			}
 			
 			System.out.println("====");
+			
+			//normaly 3 parts, start, product, end, otherwise multiple products or error
+			System.out.println("Products found: "+ (parts.length-2));
+			
+			for (int i=1; i<parts.length-1; i++) {
+				System.out.println("---- Product "+(i-1)+" ----");
+				Properties prod = new Properties();
+				prod.load(new ByteArrayInputStream(parts[i].getBytes()));
+				System.out.println("Name: "+prod.getProperty("name"));
+				System.out.println("Detailname: "+prod.getProperty("detailname"));
+				System.out.println("Vendor: "+prod.getProperty("vendor"));
+				System.out.println("Origin: "+prod.getProperty("origin"));
+				System.out.println("Descr: "+prod.getProperty("descr"));
+			}
+			
+			/***********************************************************************************/
 			for (String part : parts) {
 				System.out.println("p:"+part);				
 			}
 			System.out.println("====");
-			/*for (int i=1; i<=error_marker_counter; i++) {
-				
-			}*/
-			System.out.println("Num Objects:"+Pattern.compile("---").matcher(response3).results().count());
+			System.out.println("Num Objects:"+Pattern.compile("---").matcher(response).results().count());
 			
-			if (Pattern.compile("---").matcher(response3).results().count() != 2) {
+			if (Pattern.compile("---").matcher(response).results().count() != 2) {
 				/* error or more products */
 				
 			}
 			
-			test.load(new ByteArrayInputStream(response3.getBytes()));
+			/*test.load(new ByteArrayInputStream(response3.getBytes()));
 			System.out.println("Error: "+test.getProperty("error"));
 			System.out.println("Asin: "+test.getProperty("asin"));
 			System.out.println("name: "+test.getProperty("name"));
@@ -145,23 +147,11 @@ public class Test {
 			System.out.println("name_en: "+test.getProperty("name_en"));
 			System.out.println("detailname_en: "+test.getProperty("detailname_en"));
 			System.out.println("descr_en: "+test.getProperty("descr_en"));
-			System.out.println("validated: "+test.getProperty("validated"));
-		} catch (IOException e) {
+			System.out.println("validated: "+test.getProperty("validated"));*/
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		/*ObjectMapper mapper = new ObjectMapper();
-		try {
-			MyClass3 object = mapper.readValue(response3, MyClass3.class);
-			System.out.println("error valuve: "+object.error);
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		
 		System.exit(0);
 	}
